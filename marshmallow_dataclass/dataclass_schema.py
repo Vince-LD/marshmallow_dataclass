@@ -1,23 +1,20 @@
 from marshmallow import Schema, types
+
 from typing import (
     TYPE_CHECKING,
-    Collection,
+    Any,
+    Iterable,
     Generic,
+    List,
     Literal,
+    Mapping,
     TypeVar,
     Union,
     overload,
 )
-import typing
-import sys
-
-if sys.version_info < (3, 10):
-    from typing_extensions import ParamSpec
-else:
-    from typing import ParamSpec
 
 _T = TypeVar("_T")
-_P = ParamSpec("_P")
+_I = TypeVar("_I", bound=Iterable)
 
 
 class DataclassSchema(Schema, Generic[_T]):
@@ -26,24 +23,18 @@ class DataclassSchema(Schema, Generic[_T]):
         @overload
         def load(
             self,
-            data: (
-                typing.Mapping[str, typing.Any]
-                | typing.Iterable[typing.Mapping[str, typing.Any]]
-            ),
+            data: (Mapping[str, Any] | Iterable[Mapping[str, Any]]),
             *,
             many: Literal[True] = True,
             partial: bool | types.StrSequenceOrSet | None = None,
             unknown: str | None = None,
-        ) -> Collection[_T]:
+        ) -> List[_T]:
             ...
 
         @overload
         def load(
             self,
-            data: (
-                typing.Mapping[str, typing.Any]
-                | typing.Iterable[typing.Mapping[str, typing.Any]]
-            ),
+            data: (Mapping[str, Any] | Iterable[Mapping[str, Any]]),
             *,
             many: Literal[False] = False,
             partial: bool | types.StrSequenceOrSet | None = None,
@@ -54,28 +45,22 @@ class DataclassSchema(Schema, Generic[_T]):
         @overload
         def load(
             self,
-            data: (
-                typing.Mapping[str, typing.Any]
-                | typing.Iterable[typing.Mapping[str, typing.Any]]
-            ),
+            data: (Mapping[str, Any] | Iterable[Mapping[str, Any]]),
             *,
             many: bool | None = None,
             partial: bool | types.StrSequenceOrSet | None = None,
             unknown: str | None = None,
-        ) -> Union[_T, Collection[_T]]:
+        ) -> Union[_T, List[_T]]:
             ...
 
         def load(
             self,
-            data: (
-                typing.Mapping[str, typing.Any]
-                | typing.Iterable[typing.Mapping[str, typing.Any]]
-            ),
+            data: (Mapping[str, Any] | Iterable[Mapping[str, Any]]),
             *,
             many: bool | None = None,
             partial: bool | types.StrSequenceOrSet | None = None,
             unknown: str | None = None,
-        ) -> Union[_T, Collection[_T]]:
+        ) -> Union[_T, List[_T]]:
             ...
 
         @overload
@@ -99,7 +84,7 @@ class DataclassSchema(Schema, Generic[_T]):
             partial: bool | types.StrSequenceOrSet | None = None,
             unknown: str | None = None,
             **kwargs,
-        ) -> Collection[_T]:
+        ) -> List[_T]:
             ...
 
         @overload
@@ -111,7 +96,7 @@ class DataclassSchema(Schema, Generic[_T]):
             partial: bool | types.StrSequenceOrSet | None = None,
             unknown: str | None = None,
             **kwargs,
-        ) -> Union[_T, Collection[_T]]:
+        ) -> Union[_T, List[_T]]:
             ...
 
         def loads(
@@ -122,5 +107,5 @@ class DataclassSchema(Schema, Generic[_T]):
             partial: bool | types.StrSequenceOrSet | None = None,
             unknown: str | None = None,
             **kwargs,
-        ) -> Union[_T, Collection[_T]]:
+        ) -> Union[_T, List[_T]]:
             ...
