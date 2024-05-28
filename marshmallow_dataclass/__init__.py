@@ -62,8 +62,11 @@ from typing import (
     overload,
     Sequence,
     FrozenSet,
+    TYPE_CHECKING,
 )
-from _typeshed import DataclassInstance
+
+if TYPE_CHECKING:
+    from _typeshed import DataclassInstance
 
 import marshmallow
 import typing_inspect
@@ -85,7 +88,7 @@ __all__ = ["dataclass", "add_schema", "class_schema", "field_for_schema", "NewTy
 
 NoneType = type(None)
 _U = TypeVar("_U")
-_DataclassT = TypeVar("_DataclassT", bound=DataclassInstance)
+_DataclassT = TypeVar("_DataclassT", bound="DataclassInstance")
 _NewDataclassSchemaT = Type[DataclassSchema[_DataclassT]]
 
 # Whitelist of dataclass members that will be copied to generated schema.
