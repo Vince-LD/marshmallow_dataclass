@@ -23,43 +23,43 @@ class DataclassSchema(Schema, Generic[_T]):
         @overload
         def load(
             self,
-            data: Mapping[str, Any] | Iterable[Mapping[str, Any]],
+            data: Union[Mapping[str, Any], Iterable[Mapping[str, Any]]],
             *,
             many: Literal[False],
-            partial: bool | types.StrSequenceOrSet | None = None,
-            unknown: str | None = None,
+            partial: Union[bool, types.StrSequenceOrSet, None] = None,
+            unknown: Union[str, None] = None,
         ) -> _T:
             ...
 
         @overload
         def load(
             self,
-            data: Mapping[str, Any] | Iterable[Mapping[str, Any]],
+            data: Union[Mapping[str, Any], Iterable[Mapping[str, Any]]],
             *,
             many: Literal[True],
-            partial: bool | types.StrSequenceOrSet | None = None,
-            unknown: str | None = None,
+            partial: Union[bool, types.StrSequenceOrSet, None] = None,
+            unknown: Union[str, None] = None,
         ) -> List[_T]:
             ...
 
         @overload
         def load(
             self,
-            data: Mapping[str, Any] | Iterable[Mapping[str, Any]],
+            data: Union[Mapping[str, Any], Iterable[Mapping[str, Any]]],
             *,
-            many: bool | None = None,
-            partial: bool | types.StrSequenceOrSet | None = None,
-            unknown: str | None = None,
+            many: Union[bool, None] = None,
+            partial: Union[bool, types.StrSequenceOrSet, None] = None,
+            unknown: Union[str, None] = None,
         ) -> Union[_T, List[_T]]:
             ...
 
         def load(
             self,
-            data: Mapping[str, Any] | Iterable[Mapping[str, Any]],
+            data: Union[Mapping[str, Any], Iterable[Mapping[str, Any]]],
             *,
-            many: bool | None = None,
-            partial: bool | types.StrSequenceOrSet | None = None,
-            unknown: str | None = None,
+            many: Union[bool, None] = None,
+            partial: Union[bool, types.StrSequenceOrSet, None] = None,
+            unknown: Union[str, None] = None,
         ) -> Union[_T, List[_T]]:
             # Implementation goes here
             ...
@@ -70,8 +70,8 @@ class DataclassSchema(Schema, Generic[_T]):
             json_data: str,
             *,
             many: Literal[False],
-            partial: bool | types.StrSequenceOrSet | None = None,
-            unknown: str | None = None,
+            partial: Union[bool, types.StrSequenceOrSet, None] = None,
+            unknown: Union[str, None] = None,
             **kwargs,
         ) -> _T:
             ...
@@ -82,8 +82,8 @@ class DataclassSchema(Schema, Generic[_T]):
             json_data: str,
             *,
             many: Literal[True] = True,
-            partial: bool | types.StrSequenceOrSet | None = None,
-            unknown: str | None = None,
+            partial: Union[bool, types.StrSequenceOrSet, None] = None,
+            unknown: Union[str, None] = None,
             **kwargs,
         ) -> List[_T]:
             ...
@@ -93,9 +93,9 @@ class DataclassSchema(Schema, Generic[_T]):
             self,
             json_data: str,
             *,
-            many: bool | None = None,
-            partial: bool | types.StrSequenceOrSet | None = None,
-            unknown: str | None = None,
+            many: Union[bool, None] = None,
+            partial: Union[bool, types.StrSequenceOrSet, None] = None,
+            unknown: Union[str, None] = None,
             **kwargs,
         ) -> Union[_T, List[_T]]:
             ...
@@ -104,9 +104,9 @@ class DataclassSchema(Schema, Generic[_T]):
             self,
             json_data: str,
             *,
-            many: bool | None = None,
-            partial: bool | types.StrSequenceOrSet | None = None,
-            unknown: str | None = None,
+            many: Union[bool, None] = None,
+            partial: Union[bool, types.StrSequenceOrSet, None] = None,
+            unknown: Union[str, None] = None,
             **kwargs,
         ) -> Union[_T, List[_T]]:
             ...
