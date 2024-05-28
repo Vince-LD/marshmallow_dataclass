@@ -1,4 +1,4 @@
-from marshmallow import Schema
+from marshmallow import Schema, types
 from typing import (
     TYPE_CHECKING,
     Collection,
@@ -6,9 +6,9 @@ from typing import (
     Literal,
     TypeVar,
     Union,
-    cast,
     overload,
 )
+import typing
 import sys
 
 if sys.version_info < (3, 10):
@@ -24,27 +24,103 @@ class DataclassSchema(Schema, Generic[_T]):
     if TYPE_CHECKING:
 
         @overload
-        def load(self, *args, many: Literal[True] = True, **kwargs) -> Collection[_T]:
+        def load(
+            self,
+            data: (
+                typing.Mapping[str, typing.Any]
+                | typing.Iterable[typing.Mapping[str, typing.Any]]
+            ),
+            *,
+            many: Literal[True] = True,
+            partial: bool | types.StrSequenceOrSet | None = None,
+            unknown: str | None = None,
+        ) -> Collection[_T]:
             ...
 
         @overload
-        def load(self, *args, many: Literal[False] = False, **kwargs) -> _T:
+        def load(
+            self,
+            data: (
+                typing.Mapping[str, typing.Any]
+                | typing.Iterable[typing.Mapping[str, typing.Any]]
+            ),
+            *,
+            many: Literal[False] = False,
+            partial: bool | types.StrSequenceOrSet | None = None,
+            unknown: str | None = None,
+        ) -> _T:
+            ...
+
+        @overload
+        def load(
+            self,
+            data: (
+                typing.Mapping[str, typing.Any]
+                | typing.Iterable[typing.Mapping[str, typing.Any]]
+            ),
+            *,
+            many: bool | None = None,
+            partial: bool | types.StrSequenceOrSet | None = None,
+            unknown: str | None = None,
+        ) -> Union[_T, Collection[_T]]:
             ...
 
         def load(
-            self, *args, many: bool | None = False, **kwargs
+            self,
+            data: (
+                typing.Mapping[str, typing.Any]
+                | typing.Iterable[typing.Mapping[str, typing.Any]]
+            ),
+            *,
+            many: bool | None = None,
+            partial: bool | types.StrSequenceOrSet | None = None,
+            unknown: str | None = None,
         ) -> Union[_T, Collection[_T]]:
-            return cast(_T, super().loads(*args, **kwargs))
-
-        @overload
-        def loads(self, *args, many: Literal[True] = True, **kwargs) -> Collection[_T]:
             ...
 
         @overload
-        def loads(self, *args, many: Literal[False] = False, **kwargs) -> _T:
+        def loads(
+            self,
+            json_data: str,
+            *,
+            many: Literal[False] = False,
+            partial: bool | types.StrSequenceOrSet | None = None,
+            unknown: str | None = None,
+            **kwargs,
+        ) -> _T:
+            ...
+
+        @overload
+        def loads(
+            self,
+            json_data: str,
+            *,
+            many: Literal[True] = True,
+            partial: bool | types.StrSequenceOrSet | None = None,
+            unknown: str | None = None,
+            **kwargs,
+        ) -> Collection[_T]:
+            ...
+
+        @overload
+        def loads(
+            self,
+            json_data: str,
+            *,
+            many: bool | None = None,
+            partial: bool | types.StrSequenceOrSet | None = None,
+            unknown: str | None = None,
+            **kwargs,
+        ) -> Union[_T, Collection[_T]]:
             ...
 
         def loads(
-            self, *args, many: bool | None = False, **kwargs
+            self,
+            json_data: str,
+            *,
+            many: bool | None = None,
+            partial: bool | types.StrSequenceOrSet | None = None,
+            unknown: str | None = None,
+            **kwargs,
         ) -> Union[_T, Collection[_T]]:
             ...
