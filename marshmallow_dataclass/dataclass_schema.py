@@ -23,20 +23,9 @@ class DataclassSchema(Schema, Generic[_T]):
         @overload
         def load(
             self,
-            data: (Mapping[str, Any] | Iterable[Mapping[str, Any]]),
+            data: Mapping[str, Any] | Iterable[Mapping[str, Any]],
             *,
-            many: Literal[True] = True,
-            partial: bool | types.StrSequenceOrSet | None = None,
-            unknown: str | None = None,
-        ) -> List[_T]:
-            ...
-
-        @overload
-        def load(
-            self,
-            data: (Mapping[str, Any] | Iterable[Mapping[str, Any]]),
-            *,
-            many: Literal[False] = False,
+            many: Literal[False],
             partial: bool | types.StrSequenceOrSet | None = None,
             unknown: str | None = None,
         ) -> _T:
@@ -45,7 +34,18 @@ class DataclassSchema(Schema, Generic[_T]):
         @overload
         def load(
             self,
-            data: (Mapping[str, Any] | Iterable[Mapping[str, Any]]),
+            data: Mapping[str, Any] | Iterable[Mapping[str, Any]],
+            *,
+            many: Literal[True],
+            partial: bool | types.StrSequenceOrSet | None = None,
+            unknown: str | None = None,
+        ) -> List[_T]:
+            ...
+
+        @overload
+        def load(
+            self,
+            data: Mapping[str, Any] | Iterable[Mapping[str, Any]],
             *,
             many: bool | None = None,
             partial: bool | types.StrSequenceOrSet | None = None,
@@ -55,12 +55,13 @@ class DataclassSchema(Schema, Generic[_T]):
 
         def load(
             self,
-            data: (Mapping[str, Any] | Iterable[Mapping[str, Any]]),
+            data: Mapping[str, Any] | Iterable[Mapping[str, Any]],
             *,
             many: bool | None = None,
             partial: bool | types.StrSequenceOrSet | None = None,
             unknown: str | None = None,
         ) -> Union[_T, List[_T]]:
+            # Implementation goes here
             ...
 
         @overload
@@ -68,7 +69,7 @@ class DataclassSchema(Schema, Generic[_T]):
             self,
             json_data: str,
             *,
-            many: Literal[False] = False,
+            many: Literal[False],
             partial: bool | types.StrSequenceOrSet | None = None,
             unknown: str | None = None,
             **kwargs,
