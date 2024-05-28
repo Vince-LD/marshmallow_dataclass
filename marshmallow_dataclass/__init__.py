@@ -63,6 +63,7 @@ from typing import (
     Sequence,
     FrozenSet,
 )
+from _typeshed import DataclassInstance
 
 import marshmallow
 import typing_inspect
@@ -84,6 +85,8 @@ __all__ = ["dataclass", "add_schema", "class_schema", "field_for_schema", "NewTy
 
 NoneType = type(None)
 _U = TypeVar("_U")
+_DataclassT = TypeVar("_DataclassT", bound=DataclassInstance)
+_NewDataclassSchemaT = Type[DataclassSchema[_DataclassT]]
 
 # Whitelist of dataclass members that will be copied to generated schema.
 MEMBERS_WHITELIST: Set[str] = {"Meta"}
@@ -139,7 +142,7 @@ def _maybe_get_callers_frame(
 
 @overload
 def dataclass(
-    _cls: Type[_U],
+    _cls: Type[_DataclassT],
     *,
     repr: bool = True,
     eq: bool = True,
@@ -148,7 +151,7 @@ def dataclass(
     frozen: bool = False,
     base_schema: Optional[Type[marshmallow.Schema]] = None,
     cls_frame: Optional[types.FrameType] = None,
-) -> Type[_U]:
+) -> Type[_DataclassT]:
     ...
 
 
@@ -162,7 +165,7 @@ def dataclass(
     frozen: bool = False,
     base_schema: Optional[Type[marshmallow.Schema]] = None,
     cls_frame: Optional[types.FrameType] = None,
-) -> Callable[[Type[_U]], Type[_U]]:
+) -> Callable[[Type[_DataclassT]], Type[_DataclassT]]:
     ...
 
 
@@ -171,7 +174,7 @@ def dataclass(
 # decorator is being called with parameters or not.
 @dataclass_transform(field_specifiers=(dataclasses.Field, dataclasses.field))
 def dataclass(
-    _cls: Optional[Type[_U]] = None,
+    _cls: Optional[Type[_DataclassT]] = None,
     *,
     repr: bool = True,
     eq: bool = True,
@@ -181,7 +184,7 @@ def dataclass(
     base_schema: Optional[Type[marshmallow.Schema]] = None,
     cls_frame: Optional[types.FrameType] = None,
     stacklevel: int = 1,
-) -> Union[Type[_U], Callable[[Type[_U]], Type[_U]]]:
+) -> Union[Type[_DataclassT], Callable[[Type[_DataclassT]], Type[_DataclassT]]]:
     """
     This decorator does the same as dataclasses.dataclass, but also applies :func:`add_schema`.
     It adds a `.Schema` attribute to the class object
@@ -211,7 +214,7 @@ def dataclass(
         repr=repr, eq=eq, order=order, unsafe_hash=unsafe_hash, frozen=frozen
     )
 
-    def decorator(cls: Type[_U], stacklevel: int = 1) -> Type[_U]:
+    def decorator(cls: Type[_DataclassT], stacklevel: int = 1) -> Type[_DataclassT]:
         return add_schema(
             dc(cls), base_schema, cls_frame=cls_frame, stacklevel=stacklevel + 1
         )
@@ -222,24 +225,24 @@ def dataclass(
 
 
 @overload
-def add_schema(_cls: Type[_U]) -> Type[_U]:
+def add_schema(_cls: Type[_DataclassT]) -> Type[_DataclassT]:
     ...
 
 
 @overload
 def add_schema(
     base_schema: Optional[Type[marshmallow.Schema]] = None,
-) -> Callable[[Type[_U]], Type[_U]]:
+) -> Callable[[Type[_DataclassT]], Type[_DataclassT]]:
     ...
 
 
 @overload
 def add_schema(
-    _cls: Type[_U],
+    _cls: Type[_DataclassT],
     base_schema: Optional[Type[marshmallow.Schema]] = None,
     cls_frame: Optional[types.FrameType] = None,
     stacklevel: int = 1,
-) -> Type[_U]:
+) -> Type[_DataclassT]:
     ...
 
 
@@ -265,7 +268,9 @@ def add_schema(_cls=None, base_schema=None, cls_frame=None, stacklevel=1):
     Artist(names=('Martin', 'Ramirez'))
     """
 
-    def decorator(clazz: Type[_U], stacklevel: int = stacklevel) -> Type[_U]:
+    def decorator(
+        clazz: Type[_DataclassT], stacklevel: int = stacklevel
+    ) -> Type[_DataclassT]:
         if cls_frame is not None:
             frame = cls_frame
         else:
@@ -286,35 +291,35 @@ def add_schema(_cls=None, base_schema=None, cls_frame=None, stacklevel=1):
 
 @overload
 def class_schema(
-    clazz: Type[_U],
+    clazz: Type[_DataclassT],
     base_schema: Optional[Type[marshmallow.Schema]] = None,
     *,
     globalns: Optional[Dict[str, Any]] = None,
     localns: Optional[Dict[str, Any]] = None,
-) -> Type[DataclassSchema[_U]]:
+) -> _NewDataclassSchemaT[_DataclassT]:
     ...
 
 
 @overload
 def class_schema(
-    clazz: Type[_U],
+    clazz: Type[_DataclassT],
     base_schema: Optional[Type[marshmallow.Schema]] = None,
     clazz_frame: Optional[types.FrameType] = None,
     *,
     globalns: Optional[Dict[str, Any]] = None,
-) -> Type[DataclassSchema[_U]]:
+) -> _NewDataclassSchemaT[_DataclassT]:
     ...
 
 
 def class_schema(
-    clazz: Type[_U],
+    clazz: Type[_DataclassT],
     base_schema: Optional[Type[marshmallow.Schema]] = None,
     # FIXME: delete clazz_frame from API?
     clazz_frame: Optional[types.FrameType] = None,
     *,
     globalns: Optional[Dict[str, Any]] = None,
     localns: Optional[Dict[str, Any]] = None,
-) -> Type[DataclassSchema[_U]]:
+) -> _NewDataclassSchemaT[_DataclassT]:
     """
     Convert a class to a marshmallow schema
 
@@ -507,9 +512,9 @@ _schema_ctx_stack = _LocalStack[_SchemaContext]()
 
 @lru_cache(maxsize=MAX_CLASS_SCHEMA_CACHE_SIZE)
 def _internal_class_schema(
-    clazz: Type[_U],
+    clazz: Type[_DataclassT],
     base_schema: Optional[Type[marshmallow.Schema]] = None,
-) -> Type[DataclassSchema[_U]]:
+) -> _NewDataclassSchemaT[_DataclassT]:
     schema_ctx = _schema_ctx_stack.top
     schema_ctx.seen_classes[clazz] = clazz.__name__
     try:
@@ -564,7 +569,7 @@ def _internal_class_schema(
     )
 
     schema_class = type(clazz.__name__, (_base_schema(clazz, base_schema),), attributes)
-    return cast(Type[DataclassSchema[_U]], schema_class)
+    return cast(_NewDataclassSchemaT[_DataclassT], schema_class)
 
 
 def _field_by_type(
@@ -981,3 +986,9 @@ if __name__ == "__main__":
     import doctest
 
     doctest.testmod(verbose=True)
+
+    @dataclass
+    class Test:
+        a: int
+
+    d = class_schema(Test)().load({}, many=False)
