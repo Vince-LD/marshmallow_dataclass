@@ -68,7 +68,7 @@ import marshmallow
 import typing_inspect
 
 from marshmallow_dataclass.lazy_class_attribute import lazy_class_attribute
-
+from marshmallow_dataclass.dataclass_schema import DataclassSchema
 
 if sys.version_info >= (3, 11):
     from typing import dataclass_transform
@@ -286,35 +286,35 @@ def add_schema(_cls=None, base_schema=None, cls_frame=None, stacklevel=1):
 
 @overload
 def class_schema(
-    clazz: type,
+    clazz: Type[_U],
     base_schema: Optional[Type[marshmallow.Schema]] = None,
     *,
     globalns: Optional[Dict[str, Any]] = None,
     localns: Optional[Dict[str, Any]] = None,
-) -> Type[marshmallow.Schema]:
+) -> Type[DataclassSchema[_U]]:
     ...
 
 
 @overload
 def class_schema(
-    clazz: type,
+    clazz: Type[_U],
     base_schema: Optional[Type[marshmallow.Schema]] = None,
     clazz_frame: Optional[types.FrameType] = None,
     *,
     globalns: Optional[Dict[str, Any]] = None,
-) -> Type[marshmallow.Schema]:
+) -> Type[DataclassSchema[_U]]:
     ...
 
 
 def class_schema(
-    clazz: type,
+    clazz: Type[_U],
     base_schema: Optional[Type[marshmallow.Schema]] = None,
     # FIXME: delete clazz_frame from API?
     clazz_frame: Optional[types.FrameType] = None,
     *,
     globalns: Optional[Dict[str, Any]] = None,
     localns: Optional[Dict[str, Any]] = None,
-) -> Type[marshmallow.Schema]:
+) -> Type[DataclassSchema[_U]]:
     """
     Convert a class to a marshmallow schema
 
@@ -507,9 +507,9 @@ _schema_ctx_stack = _LocalStack[_SchemaContext]()
 
 @lru_cache(maxsize=MAX_CLASS_SCHEMA_CACHE_SIZE)
 def _internal_class_schema(
-    clazz: type,
+    clazz: Type[_U],
     base_schema: Optional[Type[marshmallow.Schema]] = None,
-) -> Type[marshmallow.Schema]:
+) -> Type[DataclassSchema[_U]]:
     schema_ctx = _schema_ctx_stack.top
     schema_ctx.seen_classes[clazz] = clazz.__name__
     try:
@@ -564,7 +564,7 @@ def _internal_class_schema(
     )
 
     schema_class = type(clazz.__name__, (_base_schema(clazz, base_schema),), attributes)
-    return cast(Type[marshmallow.Schema], schema_class)
+    return cast(Type[DataclassSchema[_U]], schema_class)
 
 
 def _field_by_type(
